@@ -10,7 +10,7 @@ if (!deviceId) {
 }
 
 // Map
-const map = L.map("map").setView([38.676, -77.255], 13); // near Occoquan-ish
+const map = map.setView([38.7612, -77.3067], 13);//burke lake park
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap contributors",

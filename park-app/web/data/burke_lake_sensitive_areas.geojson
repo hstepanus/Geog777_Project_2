@@ -1,0 +1,115 @@
+{
+  "type": "FeatureCollection",
+  "name": "burke_lake_sensitive_areas",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "area_id": 1,
+        "area_type": "wetland",
+        "note": "Approximate wetland buffer for demo purposes."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -77.2948,
+              38.7667
+            ],
+            [
+              -77.2926,
+              38.7674
+            ],
+            [
+              -77.2914,
+              38.7658
+            ],
+            [
+              -77.2928,
+              38.7644
+            ],
+            [
+              -77.295,
+              38.765
+            ],
+            [
+              -77.2948,
+              38.7667
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "area_id": 2,
+        "area_type": "restoration",
+        "note": "Vegetation restoration area; keep visitors on trail."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -77.3072,
+              38.7528
+            ],
+            [
+              -77.3048,
+              38.7532
+            ],
+            [
+              -77.3045,
+              38.7515
+            ],
+            [
+              -77.3068,
+              38.7509
+            ],
+            [
+              -77.3072,
+              38.7528
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "area_id": 3,
+        "area_type": "wildlife_nesting",
+        "note": "Seasonal wildlife buffer near shoreline."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -77.3008,
+              38.7698
+            ],
+            [
+              -77.2984,
+              38.7703
+            ],
+            [
+              -77.2978,
+              38.7688
+            ],
+            [
+              -77.3002,
+              38.7683
+            ],
+            [
+              -77.3008,
+              38.7698
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
