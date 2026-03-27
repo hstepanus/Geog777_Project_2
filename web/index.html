@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Park App Demo</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+</head>
+<body>
+  <header class="topbar">
+    <input id="searchBox" placeholder="Search trails, bathrooms, shelters..." />
+    <button id="searchBtn">Search</button>
+    <button id="nearMeBtn">Near Me</button>
+  </header>
+
+  <main id="map"></main>
+
+  <section class="panel">
+    <h2>Submit a Report</h2>
+    <div class="grid">
+      <label>Category
+        <select id="category">
+          <option value="downed_tree">Downed tree</option>
+          <option value="flooding">Flooding</option>
+          <option value="trash">Trash</option>
+          <option value="wildlife">Wildlife</option>
+          <option value="safety">Safety</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <label>Description (min 20 chars)
+        <textarea id="description" rows="3" placeholder="What did you see?"></textarea>
+      </label>
+
+      <label>Photo URL (optional)
+        <input id="photoUrl" placeholder="https://..." />
+      </label>
+
+      <div class="row">
+        <button id="useMapPointBtn">Use map pin location</button>
+        <button id="submitBtn">Submit</button>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </div>
+  </section>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="app.js"></script>
+</body>
+</html>
