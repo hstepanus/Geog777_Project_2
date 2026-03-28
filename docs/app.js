@@ -61,7 +61,7 @@ function setLayerVisible(layer, isVisible) {
 
 function getTrailColor(difficulty) {
   const d = String(difficulty || "").toLowerCase();
-  if (d === "easy") return "#2e8b57";
+  if (d === "easy") return "#76107b";
   if (d === "moderate") return "#d4a017";
   return "#c0392b";
 }
