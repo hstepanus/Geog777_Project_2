@@ -1,19 +1,19 @@
 :root {
   --bg: #f4f6f8;
-  --panel: rgba(255,255,255,0.96);
+  --panel: rgba(255,255,255,0.94);
   --text: #1d2733;
   --muted: #667085;
   --border: #d9dee5;
-  --shadow: 0 10px 25px rgba(0,0,0,0.12);
+  --shadow: 0 8px 20px rgba(0,0,0,0.10);
 }
 
 body.dark {
   --bg: #101418;
-  --panel: rgba(24,28,34,0.96);
+  --panel: rgba(24,28,34,0.94);
   --text: #f3f6fa;
   --muted: #aab4c0;
   --border: #2c3540;
-  --shadow: 0 10px 25px rgba(0,0,0,0.35);
+  --shadow: 0 8px 20px rgba(0,0,0,0.30);
 }
 
 html, body {
@@ -36,25 +36,28 @@ html, body {
 
 .topbar {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
+  top: 10px;
+  left: 10px;
+  right: auto;
   z-index: 1000;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 10px;
+  border-radius: 16px;
+  padding: 8px;
   box-shadow: var(--shadow);
+  width: 350px;
+  max-width: calc(100% - 20px);
+  backdrop-filter: blur(6px);
 }
 
 .search-row,
 .action-row {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .search-row {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .topbar input,
@@ -69,20 +72,27 @@ html, body {
 input, select, textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text);
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 72px;
 }
 
 button {
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text);
   cursor: pointer;
+  font-size: 14px;
 }
 
 button:hover {
@@ -95,15 +105,18 @@ button:hover {
 
 .bottom-sheet {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
+  left: 10px;
+  right: auto;
+  bottom: 10px;
   z-index: 1000;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 16px;
   box-shadow: var(--shadow);
   overflow: hidden;
+  width: 350px;
+  max-width: calc(100% - 20px);
+  backdrop-filter: blur(6px);
 }
 
 .sheet-tabs {
@@ -116,8 +129,9 @@ button:hover {
   border: none;
   border-right: 1px solid var(--border);
   border-radius: 0;
-  padding: 12px;
+  padding: 10px 8px;
   background: transparent;
+  font-size: 14px;
 }
 
 .tab-btn:last-child {
@@ -129,8 +143,8 @@ button:hover {
 }
 
 .sheet-content {
-  padding: 14px;
-  max-height: 34vh;
+  padding: 10px;
+  max-height: 24vh;
   overflow-y: auto;
 }
 
@@ -144,20 +158,21 @@ button:hover {
 
 label {
   display: block;
-  margin-bottom: 10px;
-  font-size: 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
 }
 
 .chip-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 6px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
 }
 
 .chip {
   border-radius: 999px;
-  padding: 8px 14px;
+  padding: 6px 12px;
+  font-size: 13px;
 }
 
 .chip.active {
@@ -166,15 +181,15 @@ label {
 
 .report-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .msg {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  font-size: 14px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
 .msg.ok {
@@ -188,12 +203,13 @@ label {
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
 }
 
 .legend-line {
-  width: 28px;
+  width: 24px;
   height: 4px;
   border-radius: 4px;
   display: inline-block;
@@ -204,8 +220,8 @@ label {
 .hard { background: #c0392b; }
 
 .legend-dot {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   display: inline-block;
 }
@@ -217,18 +233,31 @@ label {
 
 .trust-note {
   color: var(--muted);
-  font-size: 13px;
-  margin-top: 12px;
+  font-size: 12px;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+@media (max-width: 767px) {
+  .topbar,
+  .bottom-sheet {
+    width: calc(100% - 20px);
+    max-width: none;
+  }
+
+  .sheet-content {
+    max-height: 28vh;
+  }
 }
 
 @media (min-width: 768px) {
   .topbar {
-    width: 420px;
+    width: 350px;
     right: auto;
   }
 
   .bottom-sheet {
-    width: 420px;
+    width: 350px;
     right: auto;
   }
 }
