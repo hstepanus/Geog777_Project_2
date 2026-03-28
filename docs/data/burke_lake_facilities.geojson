@@ -1,124 +1,180 @@
 {
   "type": "FeatureCollection",
-  "name": "burke_lake_facilities",
   "features": [
     {
       "type": "Feature",
       "properties": {
-        "facility_id": 1,
-        "name": "Information Center",
-        "type": "visitor_info",
-        "hours": "9:00-17:00",
+        "name": "Mini Golf",
+        "type": "playground",
+        "hours": "Park hours",
         "accessible": true
       },
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          -77.3194,
-          38.7617
-        ]
+          -77.305866,
+          38.762341
+        ],
+        "type": "Point"
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "facility_id": 2,
-        "name": "Main Restrooms",
+        "name": "Ice cream",
+        "type": "visitor_info",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.30518,
+          38.762617
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Facility",
+        "type": "visitor_info",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.305083,
+          38.762684
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bathroom near Ice cream store",
         "type": "bathroom",
         "hours": "Park hours",
         "accessible": true
       },
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          -77.3184,
-          38.7611
-        ]
+          -77.305083,
+          38.762684
+        ],
+        "type": "Point"
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "facility_id": 3,
-        "name": "Marina / Boat Rental",
+        "name": "Restroom near piers",
+        "type": "bathroom",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.301768,
+          38.760852
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Restroom near shelters",
+        "type": "bathroom",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.300738,
+          38.758124
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "restroom A campground",
+        "type": "bathroom",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.30165,
+          38.769585
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "restroom B campground",
+        "type": "bathroom",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.301328,
+          38.76859
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "restroom C campground",
+        "type": "bathroom",
+        "hours": "Park hours",
+        "accessible": true
+      },
+      "geometry": {
+        "coordinates": [
+          -77.302691,
+          38.768715
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Train depot",
         "type": "visitor_info",
-        "hours": "Seasonal",
-        "accessible": true
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -77.3198,
-          38.762
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "facility_id": 4,
-        "name": "Picnic Shelter A",
-        "type": "shelter",
-        "hours": "Reservable",
-        "accessible": true
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -77.3165,
-          38.76
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "facility_id": 5,
-        "name": "Playground",
-        "type": "playground",
-        "hours": "Park hours",
-        "accessible": false
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -77.317,
-          38.7592
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "facility_id": 6,
-        "name": "Water Fountain North",
-        "type": "water",
         "hours": "Park hours",
         "accessible": true
       },
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          -77.304,
-          38.7701
-        ]
+          -77.304375,
+          38.762684
+        ],
+        "type": "Point"
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "facility_id": 7,
-        "name": "Fishing Pier",
-        "type": "scenic_overlook",
+        "name": "Camp Store",
+        "type": "visitor_info",
         "hours": "Park hours",
         "accessible": true
       },
       "geometry": {
-        "type": "Point",
         "coordinates": [
-          -77.2879,
-          38.7636
-        ]
+          -77.301462,
+          38.769044
+        ],
+        "type": "Point"
       }
     }
   ]

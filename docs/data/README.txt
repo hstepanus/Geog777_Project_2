@@ -1,10 +1,11 @@
-Burke Lake Park demo GeoJSON layers
+Split from uploaded digitized data.
 
-These are simplified, app-ready demo layers for a course project.
-Geometry is approximate and intended for UI/demo use, not surveying or navigation.
+Counts:
+- Trails: 8
+- Facilities: 11
+- Parking polygons: 11
+- Sensitive/area polygons: 5
+- Unclassified: 0
 
-Suggested map center:
-[38.7612, -77.3067]
-
-Suggested zoom:
-13
+These are app-ready starter layers made from your digitized GeoJSON.
+You can replace the demo data in docs/data/ with these files.
