@@ -1,4 +1,3 @@
-const API_BASE = "http://localhost:4000";
 const PARK_ID = 1;
 
 const deviceIdKey = "parkapp_device_id";
@@ -8,7 +7,7 @@ if (!deviceId) {
   localStorage.setItem(deviceIdKey, deviceId);
 }
 
-const map = L.map("map", { zoomControl: false }).setView([38.676, -77.255], 13);
+const map = L.map("map", { zoomControl: false }).setView([38.7612, -77.3067], 14);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 const lightTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -39,7 +38,9 @@ const trailsLayer = L.geoJSON(null, {
     layer.bindPopup(`
       <b>${p.name || "Trail"}</b><br>
       Difficulty: ${p.difficulty || "N/A"}<br>
-      Length: ${p.length_mi || "N/A"} mi
+      Surface: ${p.surface || "N/A"}<br>
+      Length: ${p.length_mi || "N/A"} mi<br>
+      Allowed Uses: ${p.allowed_uses || "N/A"}
     `);
   }
 });
@@ -57,6 +58,7 @@ const facilitiesLayer = L.geoJSON(null, {
     layer.bindPopup(`
       <b>${p.name || p.type || "Facility"}</b><br>
       Type: ${p.type || "N/A"}<br>
+      Hours: ${p.hours || "N/A"}<br>
       Accessible: ${p.accessible ? "Yes" : "No"}
     `);
   }
@@ -74,7 +76,9 @@ const parkingLayer = L.geoJSON(null, {
     const p = feature.properties;
     layer.bindPopup(`
       <b>${p.name || "Parking"}</b><br>
-      Capacity: ${p.capacity || "N/A"}
+      Capacity: ${p.capacity || "N/A"}<br>
+      Accessible Spaces: ${p.accessible_spaces || "N/A"}<br>
+      Hours: ${p.hours || "N/A"}
     `);
   }
 });
@@ -97,7 +101,11 @@ const sensitiveLayer = L.geoJSON(null, {
 const reportsLayer = L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     const status = feature.properties.status;
-    const color = status === "verified" ? "#00b894" : status === "rejected" ? "#636e72" : "#ff9f43";
+    const color =
+      status === "verified" ? "#00b894" :
+      status === "rejected" ? "#636e72" :
+      "#ff9f43";
+
     return L.circleMarker(latlng, {
       radius: 8,
       fillColor: color,
@@ -109,71 +117,38 @@ const reportsLayer = L.geoJSON(null, {
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
     layer.bindPopup(`
-      <b>${p.category}</b> (${p.status})<br>
-      ${escapeHtml(p.description)}<br>
-      <small>${new Date(p.created_at).toLocaleString()}</small>
+      <b>${p.category || "Report"}</b> (${p.status || "pending"})<br>
+      ${escapeHtml(p.description || "")}<br>
+      <small>${p.created_at ? new Date(p.created_at).toLocaleString() : ""}</small>
     `);
   }
 });
 
-const searchLayer = L.geoJSON(null);
+const searchLayer = L.geoJSON(null, {
+  pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+    radius: 9,
+    fillColor: "#111111",
+    color: "#ffffff",
+    weight: 2,
+    fillOpacity: 1
+  }),
+  onEachFeature: (feature, layer) => {
+    const p = feature.properties;
+    layer.bindPopup(`<b>${p.name || "Result"}</b><br>${p.kind || ""}`);
+  }
+});
 
 let pin = null;
 let pinLatLng = null;
 let currentDifficulty = "all";
 let currentMaxLength = 10;
 
-async function loadStaticLayers() {
-  const datasets = [
-    { url: "data/trails.geojson", layer: trailsLayer },
-    { url: "data/facilities.geojson", layer: facilitiesLayer },
-    { url: "data/parking.geojson", layer: parkingLayer },
-    { url: "data/sensitive.geojson", layer: sensitiveLayer }
-  ];
-
-  for (const item of datasets) {
-    try {
-      const r = await fetch(item.url);
-      const gj = await r.json();
-      item.layer.clearLayers();
-      item.layer.addData(gj);
-    } catch (err) {
-      console.error("Failed to load", item.url, err);
-    }
-  }
-
-  trailsLayer.addTo(map);
-  facilitiesLayer.addTo(map);
-  parkingLayer.addTo(map);
-  sensitiveLayer.addTo(map);
-  reportsLayer.addTo(map);
-  searchLayer.addTo(map);
-}
-
-async function refreshReports() {
-  try {
-    const b = map.getBounds();
-    const bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].join(",");
-    const url = `${API_BASE}/api/reports?park_id=${PARK_ID}&bbox=${encodeURIComponent(bbox)}`;
-    const r = await fetch(url);
-    const data = await r.json();
-
-    reportsLayer.clearLayers();
-
-    const fc = {
-      type: "FeatureCollection",
-      features: (data.reports || []).map(r => ({
-        type: "Feature",
-        properties: r,
-        geometry: r.geom
-      }))
-    };
-
-    reportsLayer.addData(fc);
-  } catch (err) {
-    console.error(err);
-  }
-}
+let burkeTrailsData = null;
+let burkeFacilitiesData = null;
+let burkeParkingData = null;
+let burkeSensitiveData = null;
+let burkeReportsData = null;
+let burkeBoundaryData = null;
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, m => ({
@@ -187,6 +162,7 @@ function escapeHtml(s) {
 
 function setMsg(text, ok = true) {
   const el = document.getElementById("msg");
+  if (!el) return;
   el.textContent = text;
   el.className = `msg ${ok ? "ok" : "err"}`;
 }
@@ -199,23 +175,158 @@ function setLayerVisible(layer, isVisible) {
   }
 }
 
+async function fetchGeoJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`Failed to load ${url}`);
+  return await r.json();
+}
+
+async function loadStaticLayers() {
+  try {
+    const [
+      trails,
+      facilities,
+      parking,
+      sensitive,
+      reports,
+      boundary
+    ] = await Promise.all([
+      fetchGeoJSON("data/burke_lake_trails.geojson"),
+      fetchGeoJSON("data/burke_lake_facilities.geojson"),
+      fetchGeoJSON("data/burke_lake_parking.geojson"),
+      fetchGeoJSON("data/burke_lake_sensitive_areas.geojson"),
+      fetchGeoJSON("data/burke_lake_sample_reports.geojson"),
+      fetchGeoJSON("data/burke_lake_boundary.geojson")
+    ]);
+
+    burkeTrailsData = trails;
+    burkeFacilitiesData = facilities;
+    burkeParkingData = parking;
+    burkeSensitiveData = sensitive;
+    burkeReportsData = reports;
+    burkeBoundaryData = boundary;
+
+    trailsLayer.clearLayers();
+    facilitiesLayer.clearLayers();
+    parkingLayer.clearLayers();
+    sensitiveLayer.clearLayers();
+    reportsLayer.clearLayers();
+
+    trailsLayer.addData(burkeTrailsData);
+    facilitiesLayer.addData(burkeFacilitiesData);
+    parkingLayer.addData(burkeParkingData);
+    sensitiveLayer.addData(burkeSensitiveData);
+    reportsLayer.addData(burkeReportsData);
+
+    trailsLayer.addTo(map);
+    facilitiesLayer.addTo(map);
+    parkingLayer.addTo(map);
+    sensitiveLayer.addTo(map);
+    reportsLayer.addTo(map);
+    searchLayer.addTo(map);
+
+    if (burkeBoundaryData) {
+      const boundaryLayer = L.geoJSON(burkeBoundaryData);
+      map.fitBounds(boundaryLayer.getBounds(), { padding: [20, 20] });
+    }
+  } catch (err) {
+    console.error(err);
+    setMsg("Failed to load one or more Burke Lake data layers.", false);
+  }
+}
+
+async function refreshReports() {
+  try {
+    if (!burkeReportsData) {
+      burkeReportsData = await fetchGeoJSON("data/burke_lake_sample_reports.geojson");
+    }
+    reportsLayer.clearLayers();
+    reportsLayer.addData(burkeReportsData);
+  } catch (err) {
+    console.error("Failed to load reports", err);
+  }
+}
+
 function filterTrails() {
-  fetch("data/trails.geojson")
-    .then(r => r.json())
-    .then(data => {
-      const filtered = {
-        ...data,
-        features: data.features.filter(f => {
-          const d = f.properties.difficulty || "";
-          const len = Number(f.properties.length_mi || 999);
-          const difficultyMatch = currentDifficulty === "all" || d === currentDifficulty;
-          const lengthMatch = len <= currentMaxLength;
-          return difficultyMatch && lengthMatch;
-        })
-      };
-      trailsLayer.clearLayers();
-      trailsLayer.addData(filtered);
+  if (!burkeTrailsData) return;
+
+  const filtered = {
+    ...burkeTrailsData,
+    features: burkeTrailsData.features.filter(f => {
+      const d = f.properties.difficulty || "";
+      const len = Number(f.properties.length_mi || 999);
+      const difficultyMatch = currentDifficulty === "all" || d === currentDifficulty;
+      const lengthMatch = len <= currentMaxLength;
+      return difficultyMatch && lengthMatch;
+    })
+  };
+
+  trailsLayer.clearLayers();
+  trailsLayer.addData(filtered);
+}
+
+function searchStaticData(queryText) {
+  const q = queryText.toLowerCase();
+
+  const results = [];
+
+  if (burkeTrailsData) {
+    burkeTrailsData.features.forEach(f => {
+      const name = String(f.properties.name || "").toLowerCase();
+      if (name.includes(q)) {
+        const coords = f.geometry.coordinates[0];
+        results.push({
+          type: "Feature",
+          properties: {
+            name: f.properties.name,
+            kind: "trail"
+          },
+          geometry: {
+            type: "Point",
+            coordinates: coords
+          }
+        });
+      }
     });
+  }
+
+  if (burkeFacilitiesData) {
+    burkeFacilitiesData.features.forEach(f => {
+      const name = String(f.properties.name || "").toLowerCase();
+      const type = String(f.properties.type || "").toLowerCase();
+      if (name.includes(q) || type.includes(q)) {
+        results.push({
+          type: "Feature",
+          properties: {
+            name: f.properties.name || f.properties.type,
+            kind: "facility"
+          },
+          geometry: f.geometry
+        });
+      }
+    });
+  }
+
+  if (burkeParkingData) {
+    burkeParkingData.features.forEach(f => {
+      const name = String(f.properties.name || "").toLowerCase();
+      if (name.includes(q) || "parking".includes(q)) {
+        results.push({
+          type: "Feature",
+          properties: {
+            name: f.properties.name || "Parking",
+            kind: "parking"
+          },
+          geometry: f.geometry
+        });
+      }
+    });
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: results
+  };
 }
 
 document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -230,6 +341,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 document.getElementById("darkModeBtn").addEventListener("click", () => {
   document.body.classList.toggle("dark");
   isDark = !isDark;
+
   if (isDark) {
     map.removeLayer(lightTiles);
     darkTiles.addTo(map);
@@ -239,11 +351,25 @@ document.getElementById("darkModeBtn").addEventListener("click", () => {
   }
 });
 
-document.getElementById("toggleTrails").addEventListener("change", e => setLayerVisible(trailsLayer, e.target.checked));
-document.getElementById("toggleFacilities").addEventListener("change", e => setLayerVisible(facilitiesLayer, e.target.checked));
-document.getElementById("toggleParking").addEventListener("change", e => setLayerVisible(parkingLayer, e.target.checked));
-document.getElementById("toggleSensitive").addEventListener("change", e => setLayerVisible(sensitiveLayer, e.target.checked));
-document.getElementById("toggleReports").addEventListener("change", e => setLayerVisible(reportsLayer, e.target.checked));
+document.getElementById("toggleTrails").addEventListener("change", e => {
+  setLayerVisible(trailsLayer, e.target.checked);
+});
+
+document.getElementById("toggleFacilities").addEventListener("change", e => {
+  setLayerVisible(facilitiesLayer, e.target.checked);
+});
+
+document.getElementById("toggleParking").addEventListener("change", e => {
+  setLayerVisible(parkingLayer, e.target.checked);
+});
+
+document.getElementById("toggleSensitive").addEventListener("change", e => {
+  setLayerVisible(sensitiveLayer, e.target.checked);
+});
+
+document.getElementById("toggleReports").addEventListener("change", e => {
+  setLayerVisible(reportsLayer, e.target.checked);
+});
 
 document.querySelectorAll(".chip").forEach(chip => {
   chip.addEventListener("click", () => {
@@ -260,39 +386,21 @@ document.getElementById("lengthFilter").addEventListener("input", e => {
   filterTrails();
 });
 
-document.getElementById("searchBtn").addEventListener("click", async () => {
+document.getElementById("searchBtn").addEventListener("click", () => {
   const q = document.getElementById("searchBox").value.trim();
   if (q.length < 2) return setMsg("Search must be at least 2 characters.", false);
 
   searchLayer.clearLayers();
 
-  try {
-    const r = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&park_id=${PARK_ID}`);
-    const data = await r.json();
+  const results = searchStaticData(q);
+  searchLayer.addData(results);
 
-    if (!r.ok) return setMsg(data.error || "Search failed.", false);
-
-    const fc = {
-      type: "FeatureCollection",
-      features: (data.results || []).map(item => ({
-        type: "Feature",
-        properties: item,
-        geometry: item.geom
-      }))
-    };
-
-    searchLayer.addData(fc);
-    searchLayer.eachLayer(layer => {
-      const p = layer.feature.properties;
-      layer.bindPopup(`<b>${p.name}</b><br>${p.kind}`);
-    });
-
-    const bounds = searchLayer.getBounds();
-    if (bounds.isValid()) map.fitBounds(bounds.pad(0.2));
-
-    setMsg(`Found ${(data.results || []).length} result(s).`, true);
-  } catch (err) {
-    setMsg("Search failed.", false);
+  const bounds = searchLayer.getBounds();
+  if (bounds.isValid()) {
+    map.fitBounds(bounds.pad(0.2));
+    setMsg(`Found ${results.features.length} result(s).`, true);
+  } else {
+    setMsg("No matching trails or facilities found.", false);
   }
 });
 
@@ -319,51 +427,65 @@ document.getElementById("nearMeBtn").addEventListener("click", () => {
 
 document.getElementById("useMapPointBtn").addEventListener("click", () => {
   setMsg("Tap the map to place your report pin.", true);
+
   map.once("click", e => {
     pinLatLng = e.latlng;
+
     if (pin) map.removeLayer(pin);
+
     pin = L.marker(pinLatLng, { draggable: true }).addTo(map);
     pin.on("dragend", () => {
       pinLatLng = pin.getLatLng();
     });
+
     setMsg(`Pin placed at ${pinLatLng.lat.toFixed(5)}, ${pinLatLng.lng.toFixed(5)}.`, true);
   });
 });
 
-document.getElementById("submitBtn").addEventListener("click", async () => {
+document.getElementById("submitBtn").addEventListener("click", () => {
   if (!pinLatLng) return setMsg("Please drop a pin first.", false);
 
-  const payload = {
-    park_id: PARK_ID,
-    category: document.getElementById("category").value,
-    description: document.getElementById("description").value.trim(),
-    photo_url: document.getElementById("photoUrl").value.trim() || null,
-    device_id: deviceId,
-    lat: pinLatLng.lat,
-    lng: pinLatLng.lng
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value.trim();
+  const photoUrl = document.getElementById("photoUrl").value.trim() || null;
+
+  if (description.length < 20) {
+    return setMsg("Description must be at least 20 characters.", false);
+  }
+
+  const newReport = {
+    type: "Feature",
+    properties: {
+      report_id: Date.now(),
+      park_id: PARK_ID,
+      category,
+      description,
+      photo_url: photoUrl,
+      device_id: deviceId,
+      status: "pending",
+      created_at: new Date().toISOString()
+    },
+    geometry: {
+      type: "Point",
+      coordinates: [pinLatLng.lng, pinLatLng.lat]
+    }
   };
 
-  try {
-    const r = await fetch(`${API_BASE}/api/reports`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await r.json();
-
-    if (!r.ok) {
-      const details = data.details ? ` ${data.details.join(" ")}` : "";
-      return setMsg((data.error || "Submit failed.") + details, false);
-    }
-
-    document.getElementById("description").value = "";
-    document.getElementById("photoUrl").value = "";
-    setMsg("Report submitted successfully and marked as pending review.", true);
-    refreshReports();
-  } catch (err) {
-    setMsg("Submit failed.", false);
+  if (!burkeReportsData) {
+    burkeReportsData = {
+      type: "FeatureCollection",
+      features: []
+    };
   }
+
+  burkeReportsData.features.unshift(newReport);
+  reportsLayer.clearLayers();
+  reportsLayer.addData(burkeReportsData);
+
+  document.getElementById("description").value = "";
+  document.getElementById("photoUrl").value = "";
+
+  setMsg("Report submitted locally and marked as pending review.", true);
 });
 
 map.on("moveend", refreshReports);
