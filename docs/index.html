@@ -3,102 +3,172 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Occoquan Park Explorer</title>
+  <title>Burke Lake Park Explorer</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="light">
+<body>
   <div id="app">
+    <!-- Title/Header -->
+    <div class="header">
+      🌲 Burke Lake Park Explorer
+    </div>
+
+    <!-- Top Search Panel -->
     <header class="topbar">
       <div class="search-row">
-        <input id="searchBox" type="text" placeholder="Search trails, bathrooms, shelters..." />
-        <button id="searchBtn">Search</button>
+        <input
+          id="searchBox"
+          type="text"
+          placeholder="Search trails, parking, facilities..."
+        />
+        <button id="searchBtn" type="button">Search</button>
       </div>
+
       <div class="action-row">
-        <button id="nearMeBtn">Near Me</button>
-        <button id="darkModeBtn">Dark Mode</button>
+        <button id="nearMeBtn" type="button">Near Me</button>
+        <button id="darkModeBtn" type="button">Dark Mode</button>
       </div>
     </header>
 
+    <!-- Map -->
     <div id="map"></div>
 
+    <!-- Bottom Control Panel -->
     <section class="bottom-sheet">
       <div class="sheet-tabs">
-        <button class="tab-btn active" data-tab="layersTab">Layers</button>
-        <button class="tab-btn" data-tab="filtersTab">Filters</button>
-        <button class="tab-btn" data-tab="reportTab">Report</button>
-        <button class="tab-btn" data-tab="legendTab">Legend</button>
+        <button class="tab-btn active" data-tab="layersTab" type="button">Layers</button>
+        <button class="tab-btn" data-tab="filtersTab" type="button">Filters</button>
+        <button class="tab-btn" data-tab="reportTab" type="button">Report</button>
+        <button class="tab-btn" data-tab="legendTab" type="button">Legend</button>
       </div>
 
       <div class="sheet-content">
+        <!-- Layers -->
         <div id="layersTab" class="tab-panel active">
-          <label><input type="checkbox" id="toggleTrails" checked /> Trails</label>
-          <label><input type="checkbox" id="toggleFacilities" checked /> Facilities</label>
-          <label><input type="checkbox" id="toggleParking" checked /> Parking</label>
-          <label><input type="checkbox" id="toggleSensitive" checked /> Sensitive Areas</label>
-          <label><input type="checkbox" id="toggleReports" checked /> User Reports</label>
+          <div class="layer-item">
+            <span>Trails</span>
+            <input type="checkbox" id="toggleTrails" checked />
+          </div>
+
+          <div class="layer-item">
+            <span>Facilities</span>
+            <input type="checkbox" id="toggleFacilities" checked />
+          </div>
+
+          <div class="layer-item">
+            <span>Parking</span>
+            <input type="checkbox" id="toggleParking" checked />
+          </div>
+
+          <div class="layer-item">
+            <span>Sensitive Areas</span>
+            <input type="checkbox" id="toggleSensitive" checked />
+          </div>
+
+          <div class="layer-item">
+            <span>User Reports</span>
+            <input type="checkbox" id="toggleReports" checked />
+          </div>
         </div>
 
+        <!-- Filters -->
         <div id="filtersTab" class="tab-panel">
           <label>Trail Difficulty</label>
           <div class="chip-row">
-            <button class="chip active" data-difficulty="all">All</button>
-            <button class="chip" data-difficulty="easy">Easy</button>
-            <button class="chip" data-difficulty="moderate">Moderate</button>
-            <button class="chip" data-difficulty="hard">Hard</button>
+            <button class="chip active" data-difficulty="all" type="button">All</button>
+            <button class="chip" data-difficulty="easy" type="button">Easy</button>
+            <button class="chip" data-difficulty="moderate" type="button">Moderate</button>
+            <button class="chip" data-difficulty="hard" type="button">Hard</button>
           </div>
 
-          <label for="lengthFilter">Max Trail Length (miles)</label>
+          <label for="lengthFilter">Maximum Trail Length (miles)</label>
           <input id="lengthFilter" type="range" min="1" max="10" value="10" />
           <div id="lengthValue">Up to 10 miles</div>
         </div>
 
+        <!-- Report -->
         <div id="reportTab" class="tab-panel">
-          <label>Category
-            <select id="category">
-              <option value="downed_tree">Downed Tree</option>
-              <option value="flooding">Flooding</option>
-              <option value="trash">Trash</option>
-              <option value="wildlife">Wildlife</option>
-              <option value="safety">Safety</option>
-              <option value="other">Other</option>
-            </select>
-          </label>
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="downed_tree">Downed Tree</option>
+            <option value="flooding">Flooding</option>
+            <option value="trash">Trash</option>
+            <option value="wildlife">Wildlife</option>
+            <option value="safety">Safety</option>
+            <option value="other">Other</option>
+          </select>
 
-          <label>Description
-            <textarea id="description" rows="3" placeholder="Describe the issue clearly (minimum 20 characters)"></textarea>
-          </label>
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            rows="3"
+            placeholder="Describe the issue clearly (minimum 20 characters)"
+          ></textarea>
 
-          <label>Photo URL (optional)
-            <input id="photoUrl" type="text" placeholder="https://example.com/photo.jpg" />
-          </label>
+          <label for="photoUrl">Photo URL (optional)</label>
+          <input
+            id="photoUrl"
+            type="text"
+            placeholder="https://example.com/photo.jpg"
+          />
 
           <div class="report-actions">
-            <button id="useMapPointBtn">Drop Pin</button>
-            <button id="submitBtn">Submit Report</button>
+            <button id="useMapPointBtn" type="button">Drop Pin</button>
+            <button id="submitBtn" type="button">Submit Report</button>
           </div>
 
           <div id="msg" class="msg"></div>
         </div>
 
+        <!-- Legend -->
         <div id="legendTab" class="tab-panel">
-          <div class="legend-item"><span class="legend-line easy"></span> Easy Trail</div>
-          <div class="legend-item"><span class="legend-line moderate"></span> Moderate Trail</div>
-          <div class="legend-item"><span class="legend-line hard"></span> Hard Trail</div>
-          <div class="legend-item"><span class="legend-dot facility"></span> Facility</div>
-          <div class="legend-item"><span class="legend-dot parking"></span> Parking</div>
-          <div class="legend-item"><span class="legend-dot report-pending"></span> Pending Report</div>
-          <div class="legend-item"><span class="legend-dot report-verified"></span> Verified Report</div>
+          <div class="legend-item">
+            <span class="legend-line easy"></span>
+            <span>Easy Trail</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-line moderate"></span>
+            <span>Moderate Trail</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-line hard"></span>
+            <span>Hard Trail</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-dot facility"></span>
+            <span>Facilities</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-dot parking"></span>
+            <span>Parking</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-dot report"></span>
+            <span>User Reports</span>
+          </div>
+
           <p class="trust-note">
-            User-submitted reports are marked as pending until reviewed. Verified reports are more trustworthy.
+            User-submitted reports are displayed as pending items in this prototype.
+            In a full implementation, they would be validated and stored in PostGIS.
           </p>
         </div>
       </div>
     </section>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  ></script>
   <script src="app.js"></script>
 </body>
 </html>
