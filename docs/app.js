@@ -7,7 +7,7 @@ if (!deviceId) {
   localStorage.setItem(deviceIdKey, deviceId);
 }
 
-const map = L.map("map", { zoomControl: false }).setView([38.7640, -77.3088], 20);
+const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 16);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 const lightTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -331,7 +331,7 @@ async function loadStaticLayers() {
       const boundaryLayer = L.geoJSON(burkeBoundaryData);
       const bounds = boundaryLayer.getBounds();
       if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [80, 140] });
+        map.fitBounds(bounds, { paddingTopLeft: [80, 120], paddingBottomRight: [40, 220] });
       }
     }
 
