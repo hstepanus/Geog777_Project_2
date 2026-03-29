@@ -4,41 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Burke Lake Park Explorer</title>
-
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
-    <!-- Title/Header -->
-    <div class="header">
-      🌲 Burke Lake Park Explorer
-    </div>
+    <div class="header">🌲 Burke Lake Park Explorer</div>
 
-    <!-- Top Search Panel -->
     <header class="topbar">
       <div class="search-row">
-        <input
-          id="searchBox"
-          type="text"
-          placeholder="Search trails, parking, facilities..."
-        />
+        <input id="searchBox" type="text" placeholder="Search trails, parking, facilities..." />
         <button id="searchBtn" type="button">Search</button>
       </div>
-
       <div class="action-row">
         <button id="nearMeBtn" type="button">Near Me</button>
         <button id="darkModeBtn" type="button">Dark Mode</button>
       </div>
     </header>
 
-    <!-- Map -->
     <div id="map"></div>
 
-    <!-- Bottom Control Panel -->
     <section class="bottom-sheet">
       <div class="sheet-tabs">
         <button class="tab-btn active" data-tab="layersTab" type="button">Layers</button>
@@ -48,35 +33,29 @@
       </div>
 
       <div class="sheet-content">
-        <!-- Layers -->
         <div id="layersTab" class="tab-panel active">
           <div class="layer-item">
             <span>Trails</span>
             <input type="checkbox" id="toggleTrails" checked />
           </div>
-
           <div class="layer-item">
             <span>Facilities</span>
             <input type="checkbox" id="toggleFacilities" checked />
           </div>
-
           <div class="layer-item">
             <span>Parking</span>
             <input type="checkbox" id="toggleParking" checked />
           </div>
-
           <div class="layer-item">
             <span>Sensitive Areas</span>
             <input type="checkbox" id="toggleSensitive" checked />
           </div>
-
           <div class="layer-item">
             <span>User Reports</span>
             <input type="checkbox" id="toggleReports" checked />
           </div>
         </div>
 
-        <!-- Filters -->
         <div id="filtersTab" class="tab-panel">
           <label>Trail Difficulty</label>
           <div class="chip-row">
@@ -91,7 +70,6 @@
           <div id="lengthValue">Up to 10 miles</div>
         </div>
 
-        <!-- Report -->
         <div id="reportTab" class="tab-panel">
           <label for="category">Category</label>
           <select id="category">
@@ -104,18 +82,10 @@
           </select>
 
           <label for="description">Description</label>
-          <textarea
-            id="description"
-            rows="3"
-            placeholder="Describe the issue clearly (minimum 20 characters)"
-          ></textarea>
+          <textarea id="description" rows="3" placeholder="Describe the issue clearly (minimum 20 characters)"></textarea>
 
           <label for="photoUrl">Photo URL (optional)</label>
-          <input
-            id="photoUrl"
-            type="text"
-            placeholder="https://example.com/photo.jpg"
-          />
+          <input id="photoUrl" type="text" placeholder="https://example.com/photo.jpg" />
 
           <div class="report-actions">
             <button id="useMapPointBtn" type="button">Drop Pin</button>
@@ -125,50 +95,41 @@
           <div id="msg" class="msg"></div>
         </div>
 
-        <!-- Legend -->
         <div id="legendTab" class="tab-panel">
           <div class="legend-item">
             <span class="legend-line easy"></span>
             <span>Easy Trail</span>
           </div>
-
           <div class="legend-item">
             <span class="legend-line moderate"></span>
             <span>Moderate Trail</span>
           </div>
-
           <div class="legend-item">
             <span class="legend-line hard"></span>
             <span>Hard Trail</span>
           </div>
-
           <div class="legend-item">
             <span class="legend-dot facility"></span>
             <span>Facilities</span>
           </div>
-
           <div class="legend-item">
             <span class="legend-dot parking"></span>
             <span>Parking</span>
           </div>
-
           <div class="legend-item">
             <span class="legend-dot report"></span>
             <span>User Reports</span>
           </div>
 
           <p class="trust-note">
-            User-submitted reports are displayed as pending items in this prototype.
-            In a full implementation, they would be validated and stored in PostGIS.
+            User-submitted reports are displayed as pending in this prototype. In a full implementation, they would be validated and stored in PostGIS.
           </p>
         </div>
       </div>
     </section>
   </div>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  ></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

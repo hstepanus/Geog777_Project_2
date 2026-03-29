@@ -21,7 +21,6 @@ const darkTiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x
 });
 
 let isDark = false;
-
 let pin = null;
 let pinLatLng = null;
 let currentDifficulty = "all";
@@ -61,7 +60,7 @@ function setLayerVisible(layer, isVisible) {
 
 function getTrailColor(difficulty) {
   const d = String(difficulty || "").toLowerCase();
-  if (d === "easy") return "#244c04";
+  if (d === "easy") return "#2e8b57";
   if (d === "moderate") return "#d4a017";
   return "#c0392b";
 }
