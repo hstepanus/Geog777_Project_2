@@ -331,7 +331,7 @@ async function loadStaticLayers() {
       const boundaryLayer = L.geoJSON(burkeBoundaryData);
       const bounds = boundaryLayer.getBounds();
       if (bounds.isValid()) {
-        map.fitBounds(bounds, { paddingTopLeft: [80, 120], paddingBottomRight: [40, 220], maxZoom: 17
+        map.fitBounds(bounds, { paddingTopLeft: [80, 120], paddingBottomRight: [40, 220], maxZoom: 19
 
          });
       }
