@@ -7,7 +7,7 @@ if (!deviceId) {
   localStorage.setItem(deviceIdKey, deviceId);
 }
 
-const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 17);
+const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 14);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 const lightTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
