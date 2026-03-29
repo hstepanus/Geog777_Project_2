@@ -328,14 +328,21 @@ async function loadStaticLayers() {
     searchLayer.addTo(map);
 
     if (burkeBoundaryData) {
-      const boundaryLayer = L.geoJSON(burkeBoundaryData);
-      const bounds = boundaryLayer.getBounds();
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { paddingTopLeft: [80, 120], paddingBottomRight: [40, 220], maxZoom: 19
+  const boundaryLayer = L.geoJSON(burkeBoundaryData);
+  const bounds = boundaryLayer.getBounds();
 
-         });
-      }
-    }
+  if (bounds.isValid()) {
+    map.fitBounds(bounds, {
+      paddingTopLeft: [140, 160],
+      paddingBottomRight: [100, 280]
+    });
+
+    // Force a tighter zoom after fitting
+    setTimeout(() => {
+      map.setZoom(17);
+    }, 50);
+  }
+}
 
     setMsg("Burke Lake layers loaded.", true);
   } catch (err) {
