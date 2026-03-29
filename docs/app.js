@@ -7,7 +7,7 @@ if (!deviceId) {
   localStorage.setItem(deviceIdKey, deviceId);
 }
 
-const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 16);
+const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 17);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 const lightTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -326,23 +326,6 @@ async function loadStaticLayers() {
     sensitiveLayer.addTo(map);
     reportsLayer.addTo(map);
     searchLayer.addTo(map);
-
-    if (burkeBoundaryData) {
-  const boundaryLayer = L.geoJSON(burkeBoundaryData);
-  const bounds = boundaryLayer.getBounds();
-
-  if (bounds.isValid()) {
-    map.fitBounds(bounds, {
-      paddingTopLeft: [140, 160],
-      paddingBottomRight: [100, 280]
-    });
-
-    // Force a tighter zoom after fitting
-    setTimeout(() => {
-      map.setZoom(17);
-    }, 50);
-  }
-}
 
     setMsg("Burke Lake layers loaded.", true);
   } catch (err) {
