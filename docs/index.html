@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Burke Lake Park Explorer</title>
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -24,7 +27,12 @@
 
     <div id="map"></div>
 
-    <section class="bottom-sheet">
+    <section class="bottom-sheet" id="bottomPanel">
+      <div class="panel-topbar">
+        <div class="panel-title">Map Tools</div>
+        <button id="togglePanelBtn" class="panel-toggle-btn" type="button">▾</button>
+      </div>
+
       <div class="sheet-tabs">
         <button class="tab-btn active" data-tab="layersTab" type="button">Layers</button>
         <button class="tab-btn" data-tab="filtersTab" type="button">Filters</button>
@@ -32,7 +40,7 @@
         <button class="tab-btn" data-tab="legendTab" type="button">Legend</button>
       </div>
 
-      <div class="sheet-content">
+      <div class="sheet-content" id="sheetContent">
         <div id="layersTab" class="tab-panel active">
           <div class="layer-item">
             <span>Trails</span>
@@ -89,7 +97,7 @@
 
           <div class="report-actions">
             <button id="useMapPointBtn" type="button">Drop Pin</button>
-            <button id="submitBtn" type="button">Submit Report</button>
+            <button id="submitBtn" type="button">Submit</button>
           </div>
 
           <div id="msg" class="msg"></div>
@@ -120,9 +128,8 @@
             <span class="legend-dot report"></span>
             <span>User Reports</span>
           </div>
-
           <p class="trust-note">
-            User-submitted reports are displayed as pending in this prototype. In a full implementation, they would be validated and stored in PostGIS.
+            Reports in this prototype are displayed locally and marked as pending or verified for demonstration.
           </p>
         </div>
       </div>
@@ -130,6 +137,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

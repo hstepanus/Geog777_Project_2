@@ -4,7 +4,7 @@
   --text: #1d2733;
   --muted: #667085;
   --border: #d9dee5;
-  --shadow: 0 10px 25px rgba(0,0,0,0.12);
+  --shadow: 0 10px 24px rgba(0,0,0,0.12);
   --primary: #2563eb;
 }
 
@@ -14,6 +14,7 @@ body.dark {
   --text: #f3f6fa;
   --muted: #aab4c0;
   --border: #2c3540;
+  --shadow: 0 10px 24px rgba(0,0,0,0.28);
 }
 
 html, body {
@@ -44,20 +45,20 @@ html, body {
   z-index: 1200;
   background: var(--panel);
   padding: 12px 18px;
-  border-radius: 16px;
+  border-radius: 18px;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
 }
 
 .topbar {
   position: absolute;
-  top: 68px;
+  top: 72px;
   left: 12px;
   z-index: 1100;
   background: var(--panel);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 10px;
   width: 340px;
   box-shadow: var(--shadow);
@@ -76,8 +77,8 @@ html, body {
 
 input, select, textarea {
   width: 100%;
-  padding: 9px 11px;
-  border-radius: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text);
@@ -91,8 +92,8 @@ textarea {
 }
 
 button {
-  padding: 9px 12px;
-  border-radius: 10px;
+  padding: 9px 14px;
+  border-radius: 12px;
   border: none;
   background: var(--primary);
   color: white;
@@ -108,13 +109,36 @@ button:hover {
   position: absolute;
   left: 12px;
   bottom: 12px;
-  width: 340px;
+  width: 300px;
   background: var(--panel);
   border-radius: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   overflow: hidden;
   z-index: 1150;
+}
+
+.panel-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.panel-toggle-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
 .sheet-tabs {
@@ -128,8 +152,8 @@ body.dark .sheet-tabs {
 
 .tab-btn {
   flex: 1;
-  padding: 10px;
-  font-size: 13px;
+  padding: 8px;
+  font-size: 12px;
   border: none;
   border-right: 1px solid var(--border);
   border-radius: 0;
@@ -144,7 +168,7 @@ body.dark .sheet-tabs {
 .tab-btn.active {
   background: white;
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700;
   border-bottom: 2px solid var(--primary);
 }
 
@@ -154,7 +178,7 @@ body.dark .tab-btn.active {
 
 .sheet-content {
   padding: 10px;
-  max-height: 30vh;
+  max-height: 210px;
   overflow-y: auto;
 }
 
@@ -170,13 +194,13 @@ body.dark .tab-btn.active {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 2px;
+  padding: 7px 2px;
   font-size: 14px;
 }
 
 .layer-item input[type="checkbox"] {
   width: auto;
-  transform: scale(1.15);
+  transform: scale(1.12);
   accent-color: var(--primary);
 }
 
@@ -204,7 +228,7 @@ label {
 .chip.active {
   background: var(--primary);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .report-actions {
@@ -236,8 +260,8 @@ label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  margin-bottom: 6px;
+  font-size: 12px;
+  margin-bottom: 4px;
 }
 
 .legend-line {
@@ -261,10 +285,24 @@ label {
 .report { background: #ff9f43; }
 
 .trust-note {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   margin-top: 8px;
   line-height: 1.4;
+}
+
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background: rgba(37, 99, 235, 0.2);
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background: rgba(37, 99, 235, 0.85);
+  color: white;
+  font-weight: 700;
 }
 
 @media (max-width: 767px) {
@@ -276,10 +314,10 @@ label {
   }
 
   .header {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .sheet-content {
-    max-height: 34vh;
+    max-height: 240px;
   }
 }

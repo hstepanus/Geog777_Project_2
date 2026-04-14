@@ -7,7 +7,7 @@ if (!deviceId) {
   localStorage.setItem(deviceIdKey, deviceId);
 }
 
-const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 15);
+const map = L.map("map", { zoomControl: false }).setView([38.7660, -77.3070], 17);
 L.control.zoom({ position: "bottomright" }).addTo(map);
 
 const lightTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -25,6 +25,7 @@ let pin = null;
 let pinLatLng = null;
 let currentDifficulty = "all";
 let currentMaxLength = 10;
+let panelCollapsed = false;
 
 let burkeTrailsData = null;
 let burkeFacilitiesData = null;
@@ -84,7 +85,7 @@ function getSensitiveStyle(areaType) {
   return { color: "#16a085", fillColor: "#16a085", weight: 2, fillOpacity: 0.16 };
 }
 
-function makeEmojiIcon(emoji, bg = "#ffffff", size = 30) {
+function makeEmojiIcon(emoji, bg = "#ffffff", size = 26) {
   return L.divIcon({
     className: "facility-icon",
     html: `
@@ -182,30 +183,10 @@ const trailsLayer = L.geoJSON(null, {
   }
 });
 
-const facilitiesLayer = L.geoJSON(null, {
-  style: {
-    color: "#2b7cff",
-    weight: 2,
-    fillColor: "#2b7cff",
-    fillOpacity: 0.18
-  },
-  pointToLayer: (feature, latlng) => {
-    const sym = classifyFacility(feature.properties);
-    return L.marker(latlng, {
-      icon: makeEmojiIcon(sym.emoji, sym.bg, 30)
-    });
-  },
-  onEachFeature: (feature, layer) => {
-    const p = feature.properties;
-    const sym = classifyFacility(p);
-
-    layer.bindPopup(`
-      <b>${sym.emoji} ${escapeHtml(p.name || sym.label)}</b><br>
-      Type: ${escapeHtml(p.type || sym.type)}<br>
-      Hours: ${escapeHtml(p.hours || "Park hours")}<br>
-      Accessible: ${p.accessible === true ? "Yes" : p.accessible === false ? "No" : "N/A"}
-    `);
-  }
+const facilitiesCluster = L.markerClusterGroup({
+  disableClusteringAtZoom: 17,
+  spiderfyOnMaxZoom: true,
+  showCoverageOnHover: false
 });
 
 const parkingLayer = L.geoJSON(null, {
@@ -216,7 +197,7 @@ const parkingLayer = L.geoJSON(null, {
     fillOpacity: 0.22
   },
   pointToLayer: (feature, latlng) => L.marker(latlng, {
-    icon: makeEmojiIcon("🅿️", "#6c5ce7", 30)
+    icon: makeEmojiIcon("🅿️", "#6c5ce7", 26)
   }),
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
@@ -309,19 +290,41 @@ async function loadStaticLayers() {
     burkeBoundaryData = boundary;
 
     trailsLayer.clearLayers();
-    facilitiesLayer.clearLayers();
+    facilitiesCluster.clearLayers();
     parkingLayer.clearLayers();
     sensitiveLayer.clearLayers();
     reportsLayer.clearLayers();
 
     trailsLayer.addData(burkeTrailsData);
-    facilitiesLayer.addData(burkeFacilitiesData);
+
+    const facilityGeo = L.geoJSON(burkeFacilitiesData, {
+      pointToLayer: (feature, latlng) => {
+        const sym = classifyFacility(feature.properties);
+        return L.marker(latlng, {
+          icon: makeEmojiIcon(sym.emoji, sym.bg, 26)
+        });
+      },
+      onEachFeature: (feature, layer) => {
+        const p = feature.properties;
+        const sym = classifyFacility(p);
+
+        layer.bindPopup(`
+          <b>${sym.emoji} ${escapeHtml(p.name || sym.label)}</b><br>
+          Type: ${escapeHtml(p.type || sym.type)}<br>
+          Hours: ${escapeHtml(p.hours || "Park hours")}<br>
+          Accessible: ${p.accessible === true ? "Yes" : p.accessible === false ? "No" : "N/A"}
+        `);
+      }
+    });
+
+    facilitiesCluster.addLayer(facilityGeo);
+
     parkingLayer.addData(burkeParkingData);
     sensitiveLayer.addData(burkeSensitiveData);
     reportsLayer.addData(burkeReportsData);
 
     trailsLayer.addTo(map);
-    facilitiesLayer.addTo(map);
+    facilitiesCluster.addTo(map);
     parkingLayer.addTo(map);
     sensitiveLayer.addTo(map);
     reportsLayer.addTo(map);
@@ -376,14 +379,8 @@ function searchStaticData(queryText) {
         if (coords) {
           results.push({
             type: "Feature",
-            properties: {
-              name: f.properties.name || "Trail",
-              kind: "trail"
-            },
-            geometry: {
-              type: "Point",
-              coordinates: coords
-            }
+            properties: { name: f.properties.name || "Trail", kind: "trail" },
+            geometry: { type: "Point", coordinates: coords }
           });
         }
       }
@@ -399,14 +396,8 @@ function searchStaticData(queryText) {
         if (coords) {
           results.push({
             type: "Feature",
-            properties: {
-              name: f.properties.name || f.properties.type || "Facility",
-              kind: "facility"
-            },
-            geometry: {
-              type: "Point",
-              coordinates: coords
-            }
+            properties: { name: f.properties.name || f.properties.type || "Facility", kind: "facility" },
+            geometry: { type: "Point", coordinates: coords }
           });
         }
       }
@@ -421,24 +412,15 @@ function searchStaticData(queryText) {
         if (coords) {
           results.push({
             type: "Feature",
-            properties: {
-              name: f.properties.name || "Parking",
-              kind: "parking"
-            },
-            geometry: {
-              type: "Point",
-              coordinates: coords
-            }
+            properties: { name: f.properties.name || "Parking", kind: "parking" },
+            geometry: { type: "Point", coordinates: coords }
           });
         }
       }
     });
   }
 
-  return {
-    type: "FeatureCollection",
-    features: results
-  };
+  return { type: "FeatureCollection", features: results };
 }
 
 document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -468,7 +450,7 @@ document.getElementById("toggleTrails").addEventListener("change", e => {
 });
 
 document.getElementById("toggleFacilities").addEventListener("change", e => {
-  setLayerVisible(facilitiesLayer, e.target.checked);
+  setLayerVisible(facilitiesCluster, e.target.checked);
 });
 
 document.getElementById("toggleParking").addEventListener("change", e => {
@@ -511,7 +493,7 @@ document.getElementById("searchBtn").addEventListener("click", () => {
 
   const bounds = searchLayer.getBounds();
   if (bounds.isValid()) {
-    map.fitBounds(bounds.pad(0.2));
+    map.fitBounds(bounds.pad(0.25));
     setMsg(`Found ${results.features.length} result(s).`, true);
   } else {
     setMsg("No matching trails, facilities, or parking found.", false);
@@ -593,10 +575,7 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   };
 
   if (!burkeReportsData) {
-    burkeReportsData = {
-      type: "FeatureCollection",
-      features: []
-    };
+    burkeReportsData = { type: "FeatureCollection", features: [] };
   }
 
   burkeReportsData.features.unshift(newReport);
@@ -607,6 +586,26 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   document.getElementById("photoUrl").value = "";
 
   setMsg("Report submitted locally and marked as pending review.", true);
+});
+
+document.getElementById("togglePanelBtn").addEventListener("click", () => {
+  const panel = document.getElementById("bottomPanel");
+  const content = document.getElementById("sheetContent");
+  const btn = document.getElementById("togglePanelBtn");
+
+  panelCollapsed = !panelCollapsed;
+
+  if (panelCollapsed) {
+    content.style.display = "none";
+    document.querySelector(".sheet-tabs").style.display = "none";
+    btn.textContent = "▸";
+    panel.style.width = "140px";
+  } else {
+    content.style.display = "";
+    document.querySelector(".sheet-tabs").style.display = "";
+    btn.textContent = "▾";
+    panel.style.width = "";
+  }
 });
 
 map.on("moveend", refreshReports);
