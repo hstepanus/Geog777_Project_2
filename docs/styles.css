@@ -79,10 +79,10 @@ body {
   top: 64px;
   left: 12px;
   z-index: 1100;
-  width: 320px;
+  width: 300px;
   background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(240,247,255,0.72));
   border-radius: 18px;
-  padding: 8px;
+  padding: 6px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   backdrop-filter: var(--glass);
