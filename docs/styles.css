@@ -441,4 +441,16 @@ label {
   .sheet-content {
     max-height: 30vh;
   }
+}.leaflet-tooltip {
+  background: rgba(24, 28, 34, 0.92);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: rgba(24, 28, 34, 0.92);
 }

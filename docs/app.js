@@ -61,9 +61,9 @@ function setLayerVisible(layer, isVisible) {
 
 function getTrailColor(difficulty) {
   const d = String(difficulty || "").toLowerCase();
-  if (d === "easy") return "#2e8b57";
-  if (d === "moderate") return "#d4a017";
-  return "#c0392b";
+  if (d === "easy") return "#22c55e";
+  if (d === "moderate") return "#f59e0b";
+  return "#ef4444";
 }
 
 function getSensitiveStyle(areaType) {
@@ -144,6 +144,14 @@ function parkingPopupHTML(props) {
   `;
 }
 
+function reportPopupHTML(props) {
+  return `
+    <b>${escapeHtml(props.category || "Report")}</b> (${escapeHtml(props.status || "pending")})<br>
+    ${escapeHtml(props.description || "")}<br>
+    <small>${props.created_at ? new Date(props.created_at).toLocaleString() : ""}</small>
+  `;
+}
+
 async function fetchGeoJSON(url) {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`Failed to load ${url}`);
@@ -170,6 +178,16 @@ const trailsLayer = L.geoJSON(null, {
   }),
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
+
+    layer.bindTooltip(
+      `<b>${escapeHtml(p.name || "Trail")}</b><br>${escapeHtml(p.difficulty || "N/A")}`,
+      {
+        sticky: true,
+        direction: "top",
+        opacity: 0.95
+      }
+    );
+
     layer.bindPopup(`
       <b>${escapeHtml(p.name || "Trail")}</b><br>
       Difficulty: ${escapeHtml(p.difficulty || "N/A")}<br>
@@ -191,16 +209,26 @@ const facilitiesCluster = L.markerClusterGroup({
 
 const parkingLayer = L.geoJSON(null, {
   style: {
-    color: "#6c5ce7",
+    color: "#8b5cf6",
     weight: 2,
-    fillColor: "#6c5ce7",
+    fillColor: "#8b5cf6",
     fillOpacity: 0.22
   },
   pointToLayer: (feature, latlng) => L.marker(latlng, {
-    icon: makeEmojiIcon("🅿️", "#6c5ce7", 26)
+    icon: makeEmojiIcon("🅿️", "#8b5cf6", 26)
   }),
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
+
+    layer.bindTooltip(
+      `<b>🅿️ ${escapeHtml(p.name || "Parking")}</b>`,
+      {
+        sticky: true,
+        direction: "top",
+        opacity: 0.95
+      }
+    );
+
     layer.bindPopup(parkingPopupHTML(p));
 
     if (feature.geometry && (feature.geometry.type === "Polygon" || feature.geometry.type === "MultiPolygon")) {
@@ -214,6 +242,16 @@ const sensitiveLayer = L.geoJSON(null, {
   style: feature => getSensitiveStyle(feature.properties.area_type),
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
+
+    layer.bindTooltip(
+      `<b>${escapeHtml(p.name || p.area_type || "Sensitive Area")}</b>`,
+      {
+        sticky: true,
+        direction: "top",
+        opacity: 0.95
+      }
+    );
+
     layer.bindPopup(`
       <b>${escapeHtml(p.name || p.area_type || "Sensitive Area")}</b><br>
       Type: ${escapeHtml(p.area_type || "N/A")}<br>
@@ -222,7 +260,11 @@ const sensitiveLayer = L.geoJSON(null, {
 
     layer.on("mouseover", () => {
       const s = getSensitiveStyle(p.area_type);
-      layer.setStyle({ ...s, weight: (s.weight || 2) + 1, fillOpacity: Math.min((s.fillOpacity || 0.16) + 0.08, 0.35) });
+      layer.setStyle({
+        ...s,
+        weight: (s.weight || 2) + 1,
+        fillOpacity: Math.min((s.fillOpacity || 0.16) + 0.08, 0.35)
+      });
     });
 
     layer.on("mouseout", () => {
@@ -249,11 +291,17 @@ const reportsLayer = L.geoJSON(null, {
   },
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
-    layer.bindPopup(`
-      <b>${escapeHtml(p.category || "Report")}</b> (${escapeHtml(p.status || "pending")})<br>
-      ${escapeHtml(p.description || "")}<br>
-      <small>${p.created_at ? new Date(p.created_at).toLocaleString() : ""}</small>
-    `);
+
+    layer.bindTooltip(
+      `<b>${escapeHtml(p.category || "Report")}</b>`,
+      {
+        sticky: true,
+        direction: "top",
+        opacity: 0.95
+      }
+    );
+
+    layer.bindPopup(reportPopupHTML(p));
   }
 });
 
@@ -267,6 +315,14 @@ const searchLayer = L.geoJSON(null, {
   }),
   onEachFeature: (feature, layer) => {
     const p = feature.properties;
+    layer.bindTooltip(
+      `<b>${escapeHtml(p.name || "Result")}</b>`,
+      {
+        sticky: true,
+        direction: "top",
+        opacity: 0.95
+      }
+    );
     layer.bindPopup(`<b>${escapeHtml(p.name || "Result")}</b><br>${escapeHtml(p.kind || "")}`);
   }
 });
@@ -307,6 +363,15 @@ async function loadStaticLayers() {
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
         const sym = classifyFacility(p);
+
+        layer.bindTooltip(
+          `<b>${sym.emoji} ${escapeHtml(p.name || sym.label)}</b>`,
+          {
+            sticky: true,
+            direction: "top",
+            opacity: 0.95
+          }
+        );
 
         layer.bindPopup(`
           <b>${sym.emoji} ${escapeHtml(p.name || sym.label)}</b><br>
@@ -420,7 +485,10 @@ function searchStaticData(queryText) {
     });
   }
 
-  return { type: "FeatureCollection", features: results };
+  return {
+    type: "FeatureCollection",
+    features: results
+  };
 }
 
 document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -591,18 +659,19 @@ document.getElementById("submitBtn").addEventListener("click", () => {
 document.getElementById("togglePanelBtn").addEventListener("click", () => {
   const panel = document.getElementById("bottomPanel");
   const content = document.getElementById("sheetContent");
+  const tabs = document.querySelector(".sheet-tabs");
   const btn = document.getElementById("togglePanelBtn");
 
   panelCollapsed = !panelCollapsed;
 
   if (panelCollapsed) {
     content.style.display = "none";
-    document.querySelector(".sheet-tabs").style.display = "none";
+    tabs.style.display = "none";
     btn.textContent = "▸";
-    panel.style.width = "140px";
+    panel.style.width = "132px";
   } else {
     content.style.display = "";
-    document.querySelector(".sheet-tabs").style.display = "";
+    tabs.style.display = "";
     btn.textContent = "▾";
     panel.style.width = "";
   }
