@@ -70,19 +70,19 @@ function getSensitiveStyle(areaType) {
   const t = String(areaType || "").toLowerCase();
 
   if (t.includes("wildlife")) {
-    return { color: "#00897b", fillColor: "#26a69a", weight: 2, fillOpacity: 0.22, dashArray: "4 4" };
+    return { color: "#0f766e", fillColor: "#14b8a6", weight: 2, fillOpacity: 0.22, dashArray: "4 4" };
   }
   if (t.includes("wetland")) {
-    return { color: "#1e88e5", fillColor: "#64b5f6", weight: 2, fillOpacity: 0.18, dashArray: "3 5" };
+    return { color: "#2563eb", fillColor: "#60a5fa", weight: 2, fillOpacity: 0.18, dashArray: "3 5" };
   }
   if (t.includes("restoration")) {
-    return { color: "#43a047", fillColor: "#81c784", weight: 2, fillOpacity: 0.18 };
+    return { color: "#16a34a", fillColor: "#86efac", weight: 2, fillOpacity: 0.18 };
   }
   if (t.includes("restricted")) {
-    return { color: "#ef6c00", fillColor: "#ffb74d", weight: 2, fillOpacity: 0.18, dashArray: "6 4" };
+    return { color: "#ea580c", fillColor: "#fdba74", weight: 2, fillOpacity: 0.18, dashArray: "6 4" };
   }
 
-  return { color: "#16a085", fillColor: "#16a085", weight: 2, fillOpacity: 0.16 };
+  return { color: "#0f766e", fillColor: "#14b8a6", weight: 2, fillOpacity: 0.16 };
 }
 
 function makeEmojiIcon(emoji, bg = "#ffffff", size = 26) {
@@ -95,11 +95,11 @@ function makeEmojiIcon(emoji, bg = "#ffffff", size = 26) {
         border-radius:50%;
         background:${bg};
         border:2px solid #ffffff;
-        box-shadow:0 2px 8px rgba(0,0,0,0.28);
+        box-shadow:0 4px 12px rgba(0,0,0,0.25);
         display:flex;
         align-items:center;
         justify-content:center;
-        font-size:${Math.round(size * 0.55)}px;
+        font-size:${Math.round(size * 0.56)}px;
         line-height:1;
       ">${emoji}</div>
     `,
@@ -114,25 +114,25 @@ function classifyFacility(props) {
   const type = String(props.type || "").toLowerCase();
 
   if (type.includes("bathroom") || name.includes("bathroom") || name.includes("restroom")) {
-    return { type: "bathroom", emoji: "🚻", bg: "#2563eb", label: "Restroom" };
+    return { type: "bathroom", emoji: "🚻", bg: "#2563eb", label: "Restroom", size: 28 };
   }
   if (type.includes("visitor_info") || name.includes("camp store") || name.includes("information") || name.includes("visitor")) {
-    return { type: "visitor_info", emoji: "ℹ️", bg: "#0ea5e9", label: "Visitor Info" };
+    return { type: "visitor_info", emoji: "ℹ️", bg: "#06b6d4", label: "Visitor Info", size: 26 };
   }
   if (type.includes("playground") || name.includes("mini golf") || name.includes("golf")) {
-    return { type: "playground", emoji: "🎯", bg: "#f59e0b", label: "Activity Area" };
+    return { type: "playground", emoji: "🎯", bg: "#f59e0b", label: "Activity Area", size: 26 };
   }
   if (name.includes("train")) {
-    return { type: "train", emoji: "🚂", bg: "#6d4c41", label: "Train Stop" };
+    return { type: "train", emoji: "🚂", bg: "#8b5cf6", label: "Train Stop", size: 26 };
   }
   if (type.includes("water") || name.includes("water")) {
-    return { type: "water", emoji: "💧", bg: "#06b6d4", label: "Water" };
+    return { type: "water", emoji: "💧", bg: "#0ea5e9", label: "Water", size: 26 };
   }
   if (type.includes("scenic") || name.includes("fishing") || name.includes("pier") || name.includes("overlook")) {
-    return { type: "scenic_overlook", emoji: "🎣", bg: "#10b981", label: "Fishing / Scenic Spot" };
+    return { type: "scenic_overlook", emoji: "🎣", bg: "#10b981", label: "Fishing / Scenic Spot", size: 26 };
   }
 
-  return { type: "facility", emoji: "📍", bg: "#475569", label: "Facility" };
+  return { type: "facility", emoji: "📍", bg: "#475569", label: "Facility", size: 26 };
 }
 
 function parkingPopupHTML(props) {
@@ -170,6 +170,18 @@ function getFeatureSearchPoint(feature) {
   return null;
 }
 
+function offsetLatLng(latlng, feature, amount = 0.000035) {
+  const seed = String(feature?.properties?.name || feature?.properties?.type || "")
+    .split("")
+    .reduce((a, c) => a + c.charCodeAt(0), 0);
+
+  const angle = (seed % 360) * (Math.PI / 180);
+  const dx = Math.cos(angle) * amount;
+  const dy = Math.sin(angle) * amount;
+
+  return L.latLng(latlng.lat + dy, latlng.lng + dx);
+}
+
 const trailsLayer = L.geoJSON(null, {
   style: feature => ({
     weight: 4,
@@ -204,7 +216,12 @@ const trailsLayer = L.geoJSON(null, {
 const facilitiesCluster = L.markerClusterGroup({
   disableClusteringAtZoom: 17,
   spiderfyOnMaxZoom: true,
+  spiderfyDistanceMultiplier: 1.4,
   showCoverageOnHover: false
+});
+
+facilitiesCluster.on("clusterclick", function (a) {
+  a.layer.spiderfy();
 });
 
 const parkingLayer = L.geoJSON(null, {
@@ -277,9 +294,9 @@ const reportsLayer = L.geoJSON(null, {
   pointToLayer: (feature, latlng) => {
     const status = String(feature.properties.status || "").toLowerCase();
     const color =
-      status === "verified" ? "#00b894" :
-      status === "rejected" ? "#636e72" :
-      "#ff9f43";
+      status === "verified" ? "#10b981" :
+      status === "rejected" ? "#64748b" :
+      "#fb923c";
 
     return L.circleMarker(latlng, {
       radius: 8,
@@ -356,8 +373,10 @@ async function loadStaticLayers() {
     const facilityGeo = L.geoJSON(burkeFacilitiesData, {
       pointToLayer: (feature, latlng) => {
         const sym = classifyFacility(feature.properties);
-        return L.marker(latlng, {
-          icon: makeEmojiIcon(sym.emoji, sym.bg, 26)
+        const adjustedLatLng = offsetLatLng(latlng, feature);
+
+        return L.marker(adjustedLatLng, {
+          icon: makeEmojiIcon(sym.emoji, sym.bg, sym.size || 26)
         });
       },
       onEachFeature: (feature, layer) => {

@@ -453,4 +453,25 @@ label {
 
 .leaflet-tooltip-top:before {
   border-top-color: rgba(24, 28, 34, 0.92);
+}.leaflet-tooltip {
+  background: rgba(15, 23, 42, 0.94);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: rgba(15, 23, 42, 0.94);
+}
+
+body.dark .header {
+  background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(124,58,237,0.92));
+}
+
+body.dark .topbar,
+body.dark .bottom-sheet {
+  backdrop-filter: blur(14px);
 }
